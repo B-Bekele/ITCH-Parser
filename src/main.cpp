@@ -1,5 +1,5 @@
-#include <cstdio>
 #include <cstdint>
+#include <cstdio>
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -20,8 +20,7 @@ int main(int argc, char* argv[]) {
     std::printf("Read %zu bytes from %s\n\n", n, argv[1]);
     for (size_t i = 0; i < n; ++i) {
         std::printf("%02X ", buf[i]);
-        if ((i + 1) % 16 == 0)
-            std::printf("\n");
+        if ((i + 1) % 16 == 0) std::printf("\n");
     }
     std::printf("\n");
 

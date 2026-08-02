@@ -1,0 +1,7 @@
+Checks: >
+  -*,
+  bugprone-*,
+  performance-*,
+  readability-*,
+  modernize-use-auto,
+  modernize-use-nullptr
