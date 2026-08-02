@@ -1,6 +1,8 @@
 #include <cstdint>
 #include <cstdio>
 
+#include "endian.hpp"
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::fprintf(stderr, "Usage: itch_parser <file.itch>\n");
@@ -23,6 +25,12 @@ int main(int argc, char* argv[]) {
         if ((i + 1) % 16 == 0) std::printf("\n");
     }
     std::printf("\n");
+
+    // Quick sanity check: first 2 bytes are the message length (big-endian)
+    uint16_t raw_len;
+    std::memcpy(&raw_len, buf, sizeof(raw_len));
+    std::printf("First message length: %u bytes\n", to_host(raw_len));
+    std::printf("First message type:   '%c'\n", buf[2]);
 
     return 0;
 }
