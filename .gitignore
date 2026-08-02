@@ -1,0 +1,11 @@
+build/
+out/
+cmake-build-*/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Data files are multi-GB, don't commit
+data/*.NASDAQ_ITCH50
+data/*.gz
