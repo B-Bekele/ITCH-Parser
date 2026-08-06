@@ -1,9 +1,34 @@
-#include <cstdint>
 #include <cstdio>
-#include <cstring>
 
-#include "endian.hpp"
-#include "messages.hpp"
+#include "parser.hpp"
+
+static const char* message_name(char type) {
+    switch (type) {
+        case 'S': return "System Event";
+        case 'R': return "Stock Directory";
+        case 'H': return "Stock Trading Action";
+        case 'Y': return "Reg SHO";
+        case 'L': return "Market Participant Position";
+        case 'V': return "MWCB Decline Level";
+        case 'W': return "MWCB Status";
+        case 'K': return "IPO Quoting Period";
+        case 'J': return "LULD Auction Collar";
+        case 'h': return "Operational Halt";
+        case 'A': return "Add Order";
+        case 'F': return "Add Order (MPID)";
+        case 'E': return "Order Executed";
+        case 'C': return "Order Executed w/ Price";
+        case 'X': return "Order Cancel";
+        case 'D': return "Order Delete";
+        case 'U': return "Order Replace";
+        case 'P': return "Trade";
+        case 'Q': return "Cross Trade";
+        case 'B': return "Broken Trade";
+        case 'I': return "NOII";
+        case 'N': return "Retail Price Improvement";
+        default:  return "Unknown";
+    }
+}
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -11,36 +36,32 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::FILE* f = std::fopen(argv[1], "rb");
-    if (!f) {
-        std::fprintf(stderr, "Failed to open: %s\n", argv[1]);
+    Parser parser;
+    ParseResult result = parser.parse_file(argv[1]);
+
+    if (result.total_messages == 0) {
+        std::fprintf(stderr, "Failed to parse: %s\n", argv[1]);
         return 1;
     }
 
-    uint16_t raw_len;
-    uint8_t body[256];
-    int add_orders_printed = 0;
+    std::printf("%-30s %15s\n", "Message Type", "Count");
+    std::printf("%-30s %15s\n", "------------------------------", "---------------");
 
-    while (std::fread(&raw_len, sizeof(raw_len), 1, f) == 1) {
-        uint16_t len = to_host(raw_len);
-        if (std::fread(body, 1, len, f) != len) break;
-
-        if (body[0] == 'A' && add_orders_printed < 5) {
-            auto* msg = reinterpret_cast<const AddOrder*>(body);
-
-            char stock[9] = {};
-            std::memcpy(stock, msg->stock, 8);
-
-            double price = to_host(msg->price) / 10000.0;
-
-            std::printf("Add Order: ref=%llu side=%c shares=%u stock=%.8s price=%.4f\n",
-                        to_host(msg->order_ref), msg->side, to_host(msg->shares), stock, price);
-
-            add_orders_printed++;
-            if (add_orders_printed == 5) break;
+    for (int i = 0; i < 256; i++) {
+        if (result.message_counts[i] > 0) {
+            std::printf("%-30s %15llu\n", message_name(static_cast<char>(i)),
+                        result.message_counts[i]);
         }
     }
 
-    std::fclose(f);
+    std::printf("%-30s %15s\n", "------------------------------", "---------------");
+    std::printf("%-30s %15llu\n", "Total", result.total_messages);
+
+    double mb = result.total_bytes / (1024.0 * 1024.0);
+    double msg_per_sec = result.total_messages / result.elapsed_seconds;
+
+    std::printf("\n%.2f MB in %.2f sec\n", mb, result.elapsed_seconds);
+    std::printf("%.0f messages/sec (%.2fM msg/sec)\n", msg_per_sec, msg_per_sec / 1e6);
+
     return 0;
 }
