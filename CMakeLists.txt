@@ -6,3 +6,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(itch_parser src/main.cpp src/parser.cpp)
+
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.14.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+add_executable(parser_test test/parser_test.cpp src/parser.cpp)
+target_include_directories(parser_test PRIVATE src)
+target_link_libraries(parser_test GTest::gtest_main)
+add_test(NAME parser_test COMMAND parser_test)
