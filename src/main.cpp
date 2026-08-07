@@ -4,29 +4,52 @@
 
 static const char* message_name(char type) {
     switch (type) {
-        case 'S': return "System Event";
-        case 'R': return "Stock Directory";
-        case 'H': return "Stock Trading Action";
-        case 'Y': return "Reg SHO";
-        case 'L': return "Market Participant Position";
-        case 'V': return "MWCB Decline Level";
-        case 'W': return "MWCB Status";
-        case 'K': return "IPO Quoting Period";
-        case 'J': return "LULD Auction Collar";
-        case 'h': return "Operational Halt";
-        case 'A': return "Add Order";
-        case 'F': return "Add Order (MPID)";
-        case 'E': return "Order Executed";
-        case 'C': return "Order Executed w/ Price";
-        case 'X': return "Order Cancel";
-        case 'D': return "Order Delete";
-        case 'U': return "Order Replace";
-        case 'P': return "Trade";
-        case 'Q': return "Cross Trade";
-        case 'B': return "Broken Trade";
-        case 'I': return "NOII";
-        case 'N': return "Retail Price Improvement";
-        default:  return "Unknown";
+        case 'S':
+            return "System Event";
+        case 'R':
+            return "Stock Directory";
+        case 'H':
+            return "Stock Trading Action";
+        case 'Y':
+            return "Reg SHO";
+        case 'L':
+            return "Market Participant Position";
+        case 'V':
+            return "MWCB Decline Level";
+        case 'W':
+            return "MWCB Status";
+        case 'K':
+            return "IPO Quoting Period";
+        case 'J':
+            return "LULD Auction Collar";
+        case 'h':
+            return "Operational Halt";
+        case 'A':
+            return "Add Order";
+        case 'F':
+            return "Add Order (MPID)";
+        case 'E':
+            return "Order Executed";
+        case 'C':
+            return "Order Executed w/ Price";
+        case 'X':
+            return "Order Cancel";
+        case 'D':
+            return "Order Delete";
+        case 'U':
+            return "Order Replace";
+        case 'P':
+            return "Trade";
+        case 'Q':
+            return "Cross Trade";
+        case 'B':
+            return "Broken Trade";
+        case 'I':
+            return "NOII";
+        case 'N':
+            return "Retail Price Improvement";
+        default:
+            return "Unknown";
     }
 }
 

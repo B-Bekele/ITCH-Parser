@@ -28,35 +28,57 @@ ParseResult Parser::parse_file(const std::string& path) {
         result.total_bytes += 2 + len;
 
         switch (msg_type) {
-            case 'S': /* SystemEvent */              break;
-            case 'R': /* StockDirectory */           break;
-            case 'H': /* StockTradingAction */       break;
-            case 'Y': /* RegSHO */                   break;
-            case 'L': /* MarketParticipantPosition */ break;
-            case 'V': /* MWCBDeclineLevel */         break;
-            case 'W': /* MWCBStatus */               break;
-            case 'K': /* IPOQuotingPeriod */         break;
-            case 'J': /* LULDAuctionCollar */        break;
-            case 'h': /* OperationalHalt */          break;
-            case 'A': /* AddOrder */                 break;
-            case 'F': /* AddOrderMPID */             break;
-            case 'E': /* OrderExecuted */            break;
-            case 'C': /* OrderExecutedWithPrice */   break;
-            case 'X': /* OrderCancel */              break;
-            case 'D': /* OrderDelete */              break;
-            case 'U': /* OrderReplace */             break;
-            case 'P': /* Trade */                    break;
-            case 'Q': /* CrossTrade */               break;
-            case 'B': /* BrokenTrade */              break;
-            case 'I': /* NOII */                     break;
-            case 'N': /* RetailPriceImprovement */   break;
-            default: break;
+            case 'S': /* SystemEvent */
+                break;
+            case 'R': /* StockDirectory */
+                break;
+            case 'H': /* StockTradingAction */
+                break;
+            case 'Y': /* RegSHO */
+                break;
+            case 'L': /* MarketParticipantPosition */
+                break;
+            case 'V': /* MWCBDeclineLevel */
+                break;
+            case 'W': /* MWCBStatus */
+                break;
+            case 'K': /* IPOQuotingPeriod */
+                break;
+            case 'J': /* LULDAuctionCollar */
+                break;
+            case 'h': /* OperationalHalt */
+                break;
+            case 'A': /* AddOrder */
+                break;
+            case 'F': /* AddOrderMPID */
+                break;
+            case 'E': /* OrderExecuted */
+                break;
+            case 'C': /* OrderExecutedWithPrice */
+                break;
+            case 'X': /* OrderCancel */
+                break;
+            case 'D': /* OrderDelete */
+                break;
+            case 'U': /* OrderReplace */
+                break;
+            case 'P': /* Trade */
+                break;
+            case 'Q': /* CrossTrade */
+                break;
+            case 'B': /* BrokenTrade */
+                break;
+            case 'I': /* NOII */
+                break;
+            case 'N': /* RetailPriceImprovement */
+                break;
+            default:
+                break;
         }
     }
 
     auto end = std::chrono::high_resolution_clock::now();
-    result.elapsed_seconds =
-        std::chrono::duration<double>(end - start).count();
+    result.elapsed_seconds = std::chrono::duration<double>(end - start).count();
 
     std::fclose(f);
     return result;

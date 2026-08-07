@@ -71,8 +71,12 @@ TEST(MessageTest, decodes_system_event) {
     raw[0] = 'S';
     write_be16(raw + 1, 0);
     write_be16(raw + 3, 0);
-    raw[5] = 0x00; raw[6] = 0x00; raw[7] = 0x0A;
-    raw[8] = 0x53; raw[9] = 0xA2; raw[10] = 0x88;
+    raw[5] = 0x00;
+    raw[6] = 0x00;
+    raw[7] = 0x0A;
+    raw[8] = 0x53;
+    raw[9] = 0xA2;
+    raw[10] = 0x88;
     raw[11] = 'O';
 
     auto* msg = reinterpret_cast<const SystemEvent*>(raw);
@@ -88,12 +92,12 @@ TEST(MessageTest, decodes_system_event) {
 TEST(MessageTest, decodes_add_order) {
     uint8_t raw[36] = {};
     raw[0] = 'A';
-    write_be16(raw + 1, 10);        // stock_locate
-    write_be16(raw + 3, 0);         // tracking_number
-    std::memset(raw + 5, 0, 6);     // timestamp
-    write_be64(raw + 11, 12345);    // order_ref
-    raw[19] = 'B';                  // side
-    write_be32(raw + 20, 100);      // shares
+    write_be16(raw + 1, 10);      // stock_locate
+    write_be16(raw + 3, 0);       // tracking_number
+    std::memset(raw + 5, 0, 6);   // timestamp
+    write_be64(raw + 11, 12345);  // order_ref
+    raw[19] = 'B';                // side
+    write_be32(raw + 20, 100);    // shares
     std::memcpy(raw + 24, "AAPL    ", 8);
     write_be32(raw + 32, 1500000);  // price ($150.0000)
 
@@ -140,9 +144,9 @@ TEST(MessageTest, decodes_order_executed) {
     write_be16(raw + 1, 10);
     write_be16(raw + 3, 0);
     std::memset(raw + 5, 0, 6);
-    write_be64(raw + 11, 12345);   // order_ref
-    write_be32(raw + 19, 50);      // executed_shares
-    write_be64(raw + 23, 99999);   // match_number
+    write_be64(raw + 11, 12345);  // order_ref
+    write_be32(raw + 19, 50);     // executed_shares
+    write_be64(raw + 23, 99999);  // match_number
 
     auto* msg = reinterpret_cast<const OrderExecuted*>(raw);
     EXPECT_EQ(msg->type, 'E');
@@ -262,19 +266,20 @@ TEST(MessageTest, decodes_stock_directory) {
     write_be16(raw + 3, 0);
     std::memset(raw + 5, 0, 6);
     std::memcpy(raw + 11, "GOOG    ", 8);
-    raw[19] = 'Q';                  // market_category (Nasdaq Global Select)
-    raw[20] = 'N';                  // financial_status (Normal)
-    write_be32(raw + 21, 100);      // round_lot_size
-    raw[25] = 'N';                  // round_lots_only
-    raw[26] = 'A';                  // issue_classification
-    raw[27] = 'Z'; raw[28] = ' ';  // issue_sub_type
-    raw[29] = 'P';                  // authenticity
-    raw[30] = 'N';                  // short_sale_threshold
-    raw[31] = 'N';                  // ipo_flag
-    raw[32] = ' ';                  // luld_ref_price_tier
-    raw[33] = 'N';                  // etp_flag
-    write_be32(raw + 34, 0);        // etp_leverage_factor
-    raw[38] = 'N';                  // inverse_indicator
+    raw[19] = 'Q';              // market_category (Nasdaq Global Select)
+    raw[20] = 'N';              // financial_status (Normal)
+    write_be32(raw + 21, 100);  // round_lot_size
+    raw[25] = 'N';              // round_lots_only
+    raw[26] = 'A';              // issue_classification
+    raw[27] = 'Z';
+    raw[28] = ' ';            // issue_sub_type
+    raw[29] = 'P';            // authenticity
+    raw[30] = 'N';            // short_sale_threshold
+    raw[31] = 'N';            // ipo_flag
+    raw[32] = ' ';            // luld_ref_price_tier
+    raw[33] = 'N';            // etp_flag
+    write_be32(raw + 34, 0);  // etp_leverage_factor
+    raw[38] = 'N';            // inverse_indicator
 
     auto* msg = reinterpret_cast<const StockDirectory*>(raw);
     EXPECT_EQ(msg->type, 'R');

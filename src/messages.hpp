@@ -5,7 +5,7 @@
 #pragma pack(push, 1)
 
 struct SystemEvent {
-    char type;                // 'S'
+    char type;  // 'S'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -13,7 +13,7 @@ struct SystemEvent {
 };
 
 struct StockDirectory {
-    char type;                // 'R'
+    char type;  // 'R'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -34,7 +34,7 @@ struct StockDirectory {
 };
 
 struct StockTradingAction {
-    char type;                // 'H'
+    char type;  // 'H'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -45,7 +45,7 @@ struct StockTradingAction {
 };
 
 struct RegSHO {
-    char type;                // 'Y'
+    char type;  // 'Y'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -54,7 +54,7 @@ struct RegSHO {
 };
 
 struct MarketParticipantPosition {
-    char type;                // 'L'
+    char type;  // 'L'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -66,7 +66,7 @@ struct MarketParticipantPosition {
 };
 
 struct MWCBDeclineLevel {
-    char type;                // 'V'
+    char type;  // 'V'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -76,7 +76,7 @@ struct MWCBDeclineLevel {
 };
 
 struct MWCBStatus {
-    char type;                // 'W'
+    char type;  // 'W'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -84,7 +84,7 @@ struct MWCBStatus {
 };
 
 struct IPOQuotingPeriod {
-    char type;                // 'K'
+    char type;  // 'K'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -95,7 +95,7 @@ struct IPOQuotingPeriod {
 };
 
 struct LULDAuctionCollar {
-    char type;                // 'J'
+    char type;  // 'J'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -107,7 +107,7 @@ struct LULDAuctionCollar {
 };
 
 struct OperationalHalt {
-    char type;                // 'h'
+    char type;  // 'h'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -117,7 +117,7 @@ struct OperationalHalt {
 };
 
 struct AddOrder {
-    char type;                // 'A'
+    char type;  // 'A'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -129,7 +129,7 @@ struct AddOrder {
 };
 
 struct AddOrderMPID {
-    char type;                // 'F'
+    char type;  // 'F'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -142,7 +142,7 @@ struct AddOrderMPID {
 };
 
 struct OrderExecuted {
-    char type;                // 'E'
+    char type;  // 'E'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -152,7 +152,7 @@ struct OrderExecuted {
 };
 
 struct OrderExecutedWithPrice {
-    char type;                // 'C'
+    char type;  // 'C'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -164,7 +164,7 @@ struct OrderExecutedWithPrice {
 };
 
 struct OrderCancel {
-    char type;                // 'X'
+    char type;  // 'X'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -173,7 +173,7 @@ struct OrderCancel {
 };
 
 struct OrderDelete {
-    char type;                // 'D'
+    char type;  // 'D'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -181,7 +181,7 @@ struct OrderDelete {
 };
 
 struct OrderReplace {
-    char type;                // 'U'
+    char type;  // 'U'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -192,7 +192,7 @@ struct OrderReplace {
 };
 
 struct Trade {
-    char type;                // 'P'
+    char type;  // 'P'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -205,7 +205,7 @@ struct Trade {
 };
 
 struct CrossTrade {
-    char type;                // 'Q'
+    char type;  // 'Q'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -217,7 +217,7 @@ struct CrossTrade {
 };
 
 struct BrokenTrade {
-    char type;                // 'B'
+    char type;  // 'B'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -225,7 +225,7 @@ struct BrokenTrade {
 };
 
 struct NOII {
-    char type;                // 'I'
+    char type;  // 'I'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -241,7 +241,7 @@ struct NOII {
 };
 
 struct RetailPriceImprovement {
-    char type;                // 'N'
+    char type;  // 'N'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -250,7 +250,7 @@ struct RetailPriceImprovement {
 };
 
 struct DirectListing {
-    char type;                // 'O'
+    char type;  // 'O'
     uint16_t stock_locate;
     uint16_t tracking_number;
     uint8_t timestamp[6];
@@ -270,7 +270,8 @@ static_assert(sizeof(SystemEvent) == 12, "SystemEvent must be 12 bytes");
 static_assert(sizeof(StockDirectory) == 39, "StockDirectory must be 39 bytes");
 static_assert(sizeof(StockTradingAction) == 25, "StockTradingAction must be 25 bytes");
 static_assert(sizeof(RegSHO) == 20, "RegSHO must be 20 bytes");
-static_assert(sizeof(MarketParticipantPosition) == 26, "MarketParticipantPosition must be 26 bytes");
+static_assert(sizeof(MarketParticipantPosition) == 26,
+              "MarketParticipantPosition must be 26 bytes");
 static_assert(sizeof(MWCBDeclineLevel) == 35, "MWCBDeclineLevel must be 35 bytes");
 static_assert(sizeof(MWCBStatus) == 12, "MWCBStatus must be 12 bytes");
 static_assert(sizeof(IPOQuotingPeriod) == 28, "IPOQuotingPeriod must be 28 bytes");
