@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_executable(itch_parser src/main.cpp src/parser.cpp)
+add_executable(extract_fixture tools/extract_fixture.cpp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -20,4 +21,4 @@ enable_testing()
 add_executable(parser_test test/parser_test.cpp src/parser.cpp)
 target_include_directories(parser_test PRIVATE src)
 target_link_libraries(parser_test GTest::gtest_main)
-add_test(NAME parser_test COMMAND parser_test)
+add_test(NAME parser_test COMMAND parser_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

@@ -4,6 +4,7 @@
 
 #include "endian.hpp"
 #include "messages.hpp"
+#include "parser.hpp"
 
 // Helpers to write big-endian values into a byte buffer
 static void write_be16(uint8_t* buf, uint16_t val) {
@@ -304,4 +305,23 @@ TEST(MessageTest, decodes_broken_trade) {
     auto* msg = reinterpret_cast<const BrokenTrade*>(raw);
     EXPECT_EQ(msg->type, 'B');
     EXPECT_EQ(to_host(msg->match_number), 88888u);
+}
+
+// --- Fixture file ---
+
+TEST(ParserTest, parses_sample_fixture) {
+    Parser parser;
+    ParseResult result = parser.parse_file("data/sample.itch");
+
+    EXPECT_EQ(result.total_messages, 1000u);
+    EXPECT_EQ(result.message_counts['S'], 1u);
+    EXPECT_EQ(result.message_counts['R'], 993u);
+    EXPECT_EQ(result.message_counts['H'], 3u);
+    EXPECT_EQ(result.message_counts['Y'], 3u);
+}
+
+TEST(ParserTest, returns_zero_for_missing_file) {
+    Parser parser;
+    ParseResult result = parser.parse_file("nonexistent_file.itch");
+    EXPECT_EQ(result.total_messages, 0u);
 }
