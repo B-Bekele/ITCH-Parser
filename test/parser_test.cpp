@@ -1,10 +1,11 @@
+#include "parser.hpp"
+
 #include <gtest/gtest.h>
 
 #include <cstring>
 
 #include "endian.hpp"
 #include "messages.hpp"
-#include "parser.hpp"
 
 // Helpers to write big-endian values into a byte buffer
 static void write_be16(uint8_t* buf, uint16_t val) {
@@ -324,4 +325,128 @@ TEST(ParserTest, returns_zero_for_missing_file) {
     Parser parser;
     ParseResult result = parser.parse_file("nonexistent_file.itch");
     EXPECT_EQ(result.total_messages, 0u);
+}
+
+// --- Edge cases ---
+
+// Helper to write a temporary binary file and parse it
+class TempFileTest : public ::testing::Test {
+   protected:
+    const char* path = "test_temp.itch";
+
+    void write_file(const uint8_t* data, size_t len) {
+        std::FILE* f = std::fopen(path, "wb");
+        std::fwrite(data, 1, len, f);
+        std::fclose(f);
+    }
+
+    void TearDown() override { std::remove(path); }
+};
+
+TEST_F(TempFileTest, handles_empty_file) {
+    uint8_t empty = 0;
+    write_file(&empty, 0);
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 0u);
+}
+
+TEST_F(TempFileTest, handles_truncated_length) {
+    // Only 1 byte when we need 2 for the length field
+    uint8_t data[] = {0x00};
+    write_file(data, 1);
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 0u);
+}
+
+TEST_F(TempFileTest, handles_truncated_message_body) {
+    // Length says 12 bytes but we only provide 5
+    uint8_t data[] = {
+        0x00, 0x0C,  // length = 12
+        'S',  0x00, 0x00,
+    };
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 0u);
+}
+
+TEST_F(TempFileTest, handles_unknown_message_type) {
+    // Valid length, unknown type byte 'Z'
+    uint8_t data[14] = {};
+    write_be16(data, 12);
+    data[2] = 'Z';
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 1u);
+    EXPECT_EQ(result.message_counts['Z'], 1u);
+}
+
+TEST_F(TempFileTest, parses_single_system_event) {
+    uint8_t data[14] = {};
+    write_be16(data, 12);  // length
+    data[2] = 'S';         // type
+    data[13] = 'O';        // event_code
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 1u);
+    EXPECT_EQ(result.message_counts['S'], 1u);
+}
+
+TEST_F(TempFileTest, parses_multiple_back_to_back_messages) {
+    // System Event (12 bytes) + Add Order (36 bytes) + Order Delete (19 bytes)
+    uint8_t data[2 + 12 + 2 + 36 + 2 + 19] = {};
+    size_t pos = 0;
+
+    // System Event
+    write_be16(data + pos, 12);
+    data[pos + 2] = 'S';
+    pos += 2 + 12;
+
+    // Add Order
+    write_be16(data + pos, 36);
+    data[pos + 2] = 'A';
+    pos += 2 + 36;
+
+    // Order Delete
+    write_be16(data + pos, 19);
+    data[pos + 2] = 'D';
+    pos += 2 + 19;
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 3u);
+    EXPECT_EQ(result.message_counts['S'], 1u);
+    EXPECT_EQ(result.message_counts['A'], 1u);
+    EXPECT_EQ(result.message_counts['D'], 1u);
+}
+
+TEST_F(TempFileTest, stops_cleanly_when_second_message_is_truncated) {
+    // First message is valid, second is cut short
+    uint8_t data[2 + 12 + 2 + 3] = {};
+
+    write_be16(data, 12);
+    data[2] = 'S';
+
+    write_be16(data + 14, 12);
+    data[16] = 'S';
+    // body is only 3 bytes instead of 12
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 1u);
 }
