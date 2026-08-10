@@ -83,7 +83,16 @@ int main(int argc, char* argv[]) {
     double mb = result.total_bytes / (1024.0 * 1024.0);
     double msg_per_sec = result.total_messages / result.elapsed_seconds;
 
-    std::printf("\n%.2f MB in %.2f sec\n", mb, result.elapsed_seconds);
+    double first_sec = result.first_timestamp / 1e9;
+    double last_sec = result.last_timestamp / 1e9;
+    int first_h = static_cast<int>(first_sec) / 3600;
+    int first_m = (static_cast<int>(first_sec) % 3600) / 60;
+    int last_h = static_cast<int>(last_sec) / 3600;
+    int last_m = (static_cast<int>(last_sec) % 3600) / 60;
+
+    std::printf("\nTimestamp range: %02d:%02d - %02d:%02d (%.1f hours)\n", first_h, first_m, last_h,
+                last_m, (last_sec - first_sec) / 3600.0);
+    std::printf("%.2f MB in %.2f sec\n", mb, result.elapsed_seconds);
     std::printf("%.0f messages/sec (%.2fM msg/sec)\n", msg_per_sec, msg_per_sec / 1e6);
 
     return 0;

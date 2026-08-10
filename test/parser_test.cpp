@@ -319,6 +319,8 @@ TEST(ParserTest, parses_sample_fixture) {
     EXPECT_EQ(result.message_counts['R'], 993u);
     EXPECT_EQ(result.message_counts['H'], 3u);
     EXPECT_EQ(result.message_counts['Y'], 3u);
+    EXPECT_GT(result.first_timestamp, 0u);
+    EXPECT_GE(result.last_timestamp, result.first_timestamp);
 }
 
 TEST(ParserTest, returns_zero_for_missing_file) {
