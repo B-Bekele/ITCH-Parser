@@ -94,6 +94,7 @@ int main(int argc, char* argv[]) {
                 last_m, (last_sec - first_sec) / 3600.0);
     std::printf("%.2f MB in %.2f sec\n", mb, result.elapsed_seconds);
     std::printf("%.0f messages/sec (%.2fM msg/sec)\n", msg_per_sec, msg_per_sec / 1e6);
+    std::printf("\nOrder validation: %llu orphaned references\n", result.orphaned_refs);
 
     return 0;
 }

@@ -406,23 +406,22 @@ TEST_F(TempFileTest, parses_single_system_event) {
 }
 
 TEST_F(TempFileTest, parses_multiple_back_to_back_messages) {
-    // System Event (12 bytes) + Add Order (36 bytes) + Order Delete (19 bytes)
+    // System Event (12) + Add Order (36) + Order Delete (19), matching order_ref
     uint8_t data[2 + 12 + 2 + 36 + 2 + 19] = {};
     size_t pos = 0;
 
-    // System Event
     write_be16(data + pos, 12);
     data[pos + 2] = 'S';
     pos += 2 + 12;
 
-    // Add Order
     write_be16(data + pos, 36);
     data[pos + 2] = 'A';
+    write_be64(data + pos + 2 + 11, 1000);  // order_ref
     pos += 2 + 36;
 
-    // Order Delete
     write_be16(data + pos, 19);
     data[pos + 2] = 'D';
+    write_be64(data + pos + 2 + 11, 1000);  // same order_ref
     pos += 2 + 19;
 
     write_file(data, sizeof(data));
@@ -433,6 +432,78 @@ TEST_F(TempFileTest, parses_multiple_back_to_back_messages) {
     EXPECT_EQ(result.message_counts['S'], 1u);
     EXPECT_EQ(result.message_counts['A'], 1u);
     EXPECT_EQ(result.message_counts['D'], 1u);
+    EXPECT_EQ(result.orphaned_refs, 0u);
+}
+
+TEST_F(TempFileTest, detects_orphaned_delete_without_prior_add) {
+    // Order Delete referencing an order_ref that was never added
+    uint8_t data[2 + 19] = {};
+    write_be16(data, 19);
+    data[2] = 'D';
+    write_be64(data + 2 + 11, 9999);
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 1u);
+    EXPECT_EQ(result.orphaned_refs, 1u);
+}
+
+TEST_F(TempFileTest, detects_orphaned_execute_without_prior_add) {
+    uint8_t data[2 + 31] = {};
+    write_be16(data, 31);
+    data[2] = 'E';
+    write_be64(data + 2 + 11, 9999);
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.orphaned_refs, 1u);
+}
+
+TEST_F(TempFileTest, tracks_replace_order_lifecycle) {
+    // Add(ref=1) -> Replace(old=1, new=2) -> Delete(ref=2) should be valid
+    uint8_t data[2 + 36 + 2 + 35 + 2 + 19] = {};
+    size_t pos = 0;
+
+    write_be16(data + pos, 36);
+    data[pos + 2] = 'A';
+    write_be64(data + pos + 2 + 11, 1);
+    pos += 2 + 36;
+
+    write_be16(data + pos, 35);
+    data[pos + 2] = 'U';
+    write_be64(data + pos + 2 + 11, 1);  // original_order_ref
+    write_be64(data + pos + 2 + 19, 2);  // new_order_ref
+    pos += 2 + 35;
+
+    write_be16(data + pos, 19);
+    data[pos + 2] = 'D';
+    write_be64(data + pos + 2 + 11, 2);
+    pos += 2 + 19;
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.total_messages, 3u);
+    EXPECT_EQ(result.orphaned_refs, 0u);
+}
+
+TEST_F(TempFileTest, detects_orphaned_replace_without_prior_add) {
+    uint8_t data[2 + 35] = {};
+    write_be16(data, 35);
+    data[2] = 'U';
+    write_be64(data + 2 + 11, 1);  // original (never added)
+    write_be64(data + 2 + 19, 2);  // new
+
+    write_file(data, sizeof(data));
+
+    Parser parser;
+    ParseResult result = parser.parse_file(path);
+    EXPECT_EQ(result.orphaned_refs, 1u);
 }
 
 TEST_F(TempFileTest, stops_cleanly_when_second_message_is_truncated) {

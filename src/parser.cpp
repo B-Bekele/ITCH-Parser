@@ -12,6 +12,7 @@ static constexpr size_t BUF_SIZE = 1 << 20;  // 1 MB
 
 ParseResult Parser::parse_file(const std::string& path) {
     ParseResult result = {};
+    active_orders_.clear();
 
     std::FILE* f = std::fopen(path.c_str(), "rb");
     if (!f) return result;
@@ -99,36 +100,61 @@ ParseResult Parser::parse_file(const std::string& path) {
                 case 'A': {
                     auto* m = reinterpret_cast<const AddOrder*>(body);
                     ts = read_timestamp(m->timestamp);
+                    active_orders_.insert(to_host(m->order_ref));
                     break;
                 }
                 case 'F': {
                     auto* m = reinterpret_cast<const AddOrderMPID*>(body);
                     ts = read_timestamp(m->timestamp);
+                    active_orders_.insert(to_host(m->order_ref));
                     break;
                 }
                 case 'E': {
                     auto* m = reinterpret_cast<const OrderExecuted*>(body);
                     ts = read_timestamp(m->timestamp);
+                    if (active_orders_.find(to_host(m->order_ref)) == active_orders_.end()) {
+                        result.orphaned_refs++;
+                    }
                     break;
                 }
                 case 'C': {
                     auto* m = reinterpret_cast<const OrderExecutedWithPrice*>(body);
                     ts = read_timestamp(m->timestamp);
+                    if (active_orders_.find(to_host(m->order_ref)) == active_orders_.end()) {
+                        result.orphaned_refs++;
+                    }
                     break;
                 }
                 case 'X': {
                     auto* m = reinterpret_cast<const OrderCancel*>(body);
                     ts = read_timestamp(m->timestamp);
+                    if (active_orders_.find(to_host(m->order_ref)) == active_orders_.end()) {
+                        result.orphaned_refs++;
+                    }
                     break;
                 }
                 case 'D': {
                     auto* m = reinterpret_cast<const OrderDelete*>(body);
                     ts = read_timestamp(m->timestamp);
+                    uint64_t ref = to_host(m->order_ref);
+                    if (active_orders_.find(ref) == active_orders_.end()) {
+                        result.orphaned_refs++;
+                    } else {
+                        active_orders_.erase(ref);
+                    }
                     break;
                 }
                 case 'U': {
                     auto* m = reinterpret_cast<const OrderReplace*>(body);
                     ts = read_timestamp(m->timestamp);
+                    uint64_t old_ref = to_host(m->original_order_ref);
+                    uint64_t new_ref = to_host(m->new_order_ref);
+                    if (active_orders_.find(old_ref) == active_orders_.end()) {
+                        result.orphaned_refs++;
+                    } else {
+                        active_orders_.erase(old_ref);
+                    }
+                    active_orders_.insert(new_ref);
                     break;
                 }
                 case 'P': {
