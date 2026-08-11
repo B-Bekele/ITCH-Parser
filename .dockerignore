@@ -1,0 +1,6 @@
+build/
+data/*.NASDAQ_ITCH50
+data/*.gz
+.vs/
+.vscode/
+.git/

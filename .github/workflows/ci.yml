@@ -32,3 +32,12 @@ jobs:
         run: |
           find src test bench -name '*.cpp' -o -name '*.hpp' | \
             xargs clang-format --dry-run --Werror
+
+  docker-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t itch-parser .
